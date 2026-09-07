@@ -1,0 +1,24 @@
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Local previews / logs
+*.log
+.cache/
+
+# Original, unoptimised photos off Dad's phone.
+# These are the 4MB EXIF-carrying originals. Keep them OUT of the repo —
+# scripts/optimize-images.sh reads from here and writes into assets/img/.
+assets/img-src/
+
+# Deliberately absent from this project (see build spec §3):
+# no package.json, no node_modules, no bundler config, no framework.
+node_modules/
+package-lock.json

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+# Sitemap line is added at CP8/CP9 once the real domain exists.
