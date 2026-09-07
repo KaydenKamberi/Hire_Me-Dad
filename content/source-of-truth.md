@@ -24,6 +24,12 @@ him, because they're the words his customers use too.
 These map one-to-one to the `{{TOKEN}}` placeholders in `index.html`. The heading
 names the token; the answer under it is what gets substituted at CP6.
 
+Part 2 does the same for the prose. The build spec's token table only names
+facts, but the About paragraph and the service list need to be greppable too —
+otherwise they slip past the `grep -r "{{" .` gate at CP6 and ship as
+placeholders. So they get tokens as well, and they're named in each heading
+below.
+
 ### 🔴 `{{NAME}}` — What name should customers see?
 *Not his legal name unless that's what he goes by on a job. If he introduces
 himself as "Mike" and not "Miguel", that's the answer.*
@@ -122,14 +128,20 @@ the GitHub Pages preview URL.*
 
 ## Part 2 — The content
 
-### 🔴 Hero headline — what he does, in one line
-*The template is `{{TRADE}} in {{AREA}}`, but if he has a better line, use his.*
+### 🟡 Hero headline — an override, only if he has a better line
+*The hero's second line is built from the answers above as `{{TRADE}} in
+{{AREA}}`, so there is nothing to fill in here by default.*
+
+*If Dad has a better way of putting it, write it here and it replaces that line.
+**One constraint:** it is the page's only `<h1>`, and local search reads it, so
+it must still name the trade and the area. "Painting and drywall in Chula Vista"
+works. "Your neighborhood fix-it guy" does not, on its own.*
 
 **Answer:**
 
 ---
 
-### 🔴 About — 2 to 3 sentences, first person, plain words
+### 🔴 `{{ABOUT_BODY}}` — About, 2 to 3 sentences, first person, plain words
 *Ask him: "How would you describe yourself to a neighbor who needs work done?"
 Record the answer. Do not rewrite it into marketing copy. It must end with what
 he'll do for the customer, not with a claim about himself.*
@@ -138,7 +150,7 @@ he'll do for the customer, not with a claim about himself.*
 
 ---
 
-### 🔴 Services — 6 to 8 things he does
+### 🔴 `{{SERVICE_1}}` … `{{SERVICE_8}}` — 6 to 8 things he does
 *A checkmark list. **If it's not on the list, he doesn't do it** — so don't pad it.
 Better to have six things he's genuinely good at than ten that invite calls he'll
 turn down.*
@@ -155,7 +167,7 @@ turn down.*
 
 ---
 
-### 🔴 Service area — every city and neighborhood he'll drive to
+### 🔴 `{{AREA_LIST}}` — every city and neighborhood he'll drive to
 *Plain comma-separated text on the site, not a map. List them all here; the page
 closes with "Not sure if you're in my area? Just call and ask."*
 
@@ -163,7 +175,7 @@ closes with "Not sure if you're in my area? Just call and ask."*
 
 ---
 
-### 🔴 Testimonials — 3 to 5 real quotes
+### 🔴 `{{QUOTE_n}}` / `{{QUOTE_n_WHO}}` — 3 to 5 real quotes
 *Real customers, real words, first name + city. **Permission is required for each
 one.** No composites, no "representative" quotes, nothing written on their behalf.
 If we only have two real ones, we ship two.*
@@ -180,7 +192,7 @@ If we only have two real ones, we ship two.*
 
 ---
 
-### 🔴 Photos — 8 to 10 real job photos, plus one of Dad working
+### 🔴 `{{ALT_*}}` — 8 to 10 real job photos, plus one of Dad working
 *No stock photos, ever — see build spec §0 rule 4. Before/after pairs where they
 exist, singles where they don't. Every photo needs alt text naming the work and,
 where relevant, the city: "Repainted kitchen cabinets in Chula Vista, after".*
