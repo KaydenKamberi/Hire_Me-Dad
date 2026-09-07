@@ -5,8 +5,8 @@ no accounts to log into, no software to keep updated, no monthly fees for anythi
 except the web address itself.
 
 > **⚠️ This site is not finished and is not live to customers yet.**
-> It's at **CP0 — the empty folder structure.** There's nothing to look at on it
-> yet. See "Where the build is up to" below.
+> It's at **CP1 — colours, type and buttons exist, but no page content.** There's
+> still nothing on it worth showing anyone. See "Where the build is up to" below.
 
 ---
 
@@ -33,7 +33,7 @@ The site is built in numbered checkpoints. Each one gets finished and checked be
 the next one starts.
 
 - [x] **CP0** — Folder structure, questionnaire, preview hosting
-- [ ] **CP1** — Colours, type, buttons
+- [x] **CP1** — Colours, type, buttons
 - [ ] **CP2** — Page structure, all eight sections
 - [ ] **CP3** — Hero and the sticky call bar
 - [ ] **CP4** — About, services, photos, reviews, service area
@@ -103,3 +103,7 @@ spec in full; the short version:
 - **No stock photos, ever.** Grey `PHOTO NEEDED` blocks until the real ones arrive.
 - **Host-agnostic until CP9.** Nothing host-specific — no `netlify.toml`, no
   `data-netlify` attributes — enters this repo before then.
+
+`styleguide.html` is a build tool, not a page of the site: it renders every
+component against the stylesheet so CP1 could be checked at 375px and 1280px.
+It's noindexed and nothing links to it. **Delete it at CP8.**
