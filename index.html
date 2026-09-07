@@ -35,34 +35,36 @@
 
   <!-- ===== 1. HERO ===================================================== -->
   <section class="section" id="hero">
-    <div class="wrap stack-lg">
+    <div class="wrap hero__grid">
+      <div class="stack-lg">
 
-      <!-- This is the page's only <h1>, and local search reads it, so it has
-           to name the trade and the area (spec §5). If Dad prefers his own
-           wording, it replaces the second line only and must still contain
-           both. -->
-      <h1>
-        {{NAME}}
-        <span class="hero__trade">{{TRADE}} in {{AREA}}</span>
-      </h1>
+        <!-- This is the page's only <h1>, and local search reads it, so it has
+             to name the trade and the area (spec §5). If Dad prefers his own
+             wording, it replaces the second line only and must still contain
+             both. -->
+        <h1>
+          {{NAME}}
+          <span class="hero__trade">{{TRADE}} in {{AREA}}</span>
+        </h1>
 
-      <p class="trust">
-        <strong>{{YEARS}}+ years</strong> · Free estimates · {{LICENSE_LINE}}
-      </p>
+        <p class="trust">
+          <strong>{{YEARS}}+ years</strong> · Free estimates · {{LICENSE_LINE}}
+        </p>
 
-      <div class="btn-stack">
-        <a class="btn btn--primary" href="tel:{{PHONE_RAW}}">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .57 3.6 1 1 0 0 1-.25 1z"/></svg>
-          Call {{PHONE_DISPLAY}}
-        </a>
-        <a class="btn btn--secondary" href="sms:{{PHONE_RAW}}">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/></svg>
-          Text me
-        </a>
+        <div class="btn-stack">
+          <a class="btn btn--primary" href="tel:{{PHONE_RAW}}">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .57 3.6 1 1 0 0 1-.25 1z"/></svg>
+            Call {{PHONE_DISPLAY}}
+          </a>
+          <a class="btn btn--secondary" href="sms:{{PHONE_RAW}}">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/></svg>
+            Text me
+          </a>
+        </div>
+
       </div>
 
-      <div class="photo-needed">Photo needed: {{NAME}} on a job, 16:9, eager-loaded</div>
-
+      <div class="photo-needed hero__photo">Photo needed: {{NAME}} on a job, 16:9, eager-loaded</div>
     </div>
   </section>
 
@@ -250,9 +252,7 @@
   </a>
 </div>
 
-<!-- js/main.js is added at CP3, together with the topbar reveal that needs
-     it. Referencing a file that doesn't exist yet would 404 and break this
-     checkpoint's "zero console errors". -->
+<script src="./js/main.js" defer></script>
 
 </body>
 </html>

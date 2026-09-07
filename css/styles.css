@@ -63,6 +63,12 @@
   --focus-width: 3px;
   --focus-offset: 3px;
 
+  /* Sticky bar heights. --callbar-h is derived from the tap target and its
+     padding rather than hard-coded, so <body>'s bottom padding can never
+     drift out of sync with the bar and let it cover the footer. */
+  --topbar-h: 56px;
+  --callbar-h: calc(var(--tap) + var(--s2) * 2);
+
   /* Checkmark glyph, inlined as a mask so the list markers need no icon
      font and no network request. */
   --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.6 17.4 4.2 12l1.7-1.7 3.7 3.7 8.5-8.5L19.8 7.2z'/%3E%3C/svg%3E");
@@ -77,6 +83,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Keeps an anchored heading from landing underneath the fixed top bar. */
+  scroll-padding-top: calc(var(--topbar-h) + var(--s3));
 }
 
 body,
@@ -388,7 +396,99 @@ a:hover { text-decoration-thickness: 2px; }
 .footer hr { border: 0; border-top: 1px solid var(--line-invert); margin-block: var(--s4); }
 
 /* --------------------------------------------------------------------------
-   8. Desktop — the only breakpoint
+   8. Hero
+   -------------------------------------------------------------------------- */
+
+.hero__grid {
+  display: grid;
+  gap: var(--s6);
+}
+
+/* The trade line carries the same weight for search as the name does, so it
+   stays inside the <h1> at hero size. Lighter weight gives the two lines a
+   hierarchy without a second type size. */
+.hero__trade {
+  display: block;
+  margin-top: var(--s2);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   9. Sticky bars — mobile only
+   Both are removed at 768px+, where the whole page is visible anyway.
+   -------------------------------------------------------------------------- */
+
+/* Bottom call bar. CSS-only: it is painted on the first frame and cannot be
+   broken by a script failing to load. */
+.callbar {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s2);
+  padding: var(--s2);
+  /* Clears the home indicator on notched phones. */
+  padding-bottom: calc(var(--s2) + env(safe-area-inset-bottom, 0px));
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -2px 8px rgb(20 24 29 / .12);
+}
+
+.callbar .btn { width: 100%; min-width: 0; }
+
+/* The bar is fixed, so it sits outside the flow and would otherwise cover
+   the last of the footer. This is the padding that stops it. */
+body {
+  padding-bottom: calc(var(--callbar-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* Top bar. Revealed by JS once the hero is out of view; stays hidden with
+   JS off, which is correct — the hero's Call button and the bottom bar are
+   both still there. */
+.topbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  height: var(--topbar-h);
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.topbar[hidden] { display: none; }
+
+.topbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  height: 100%;
+}
+
+/* Truncates rather than wraps: a long name must not push the Call button
+   off the bar. */
+.topbar__name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 700;
+}
+
+/* 44px, not the 52px used elsewhere — that is the WCAG floor, and it is what
+   fits inside a 56px bar with breathing room. */
+.btn--compact {
+  flex: none;
+  width: auto;
+  min-height: 44px;
+  padding-inline: var(--s4);
+  font-size: 1rem;
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+   10. Desktop — the only breakpoint
    At 768px+ the hero gets more air and the gallery goes 2-up. Everything
    else stays single-column and centred.
    -------------------------------------------------------------------------- */
@@ -396,13 +496,39 @@ a:hover { text-decoration-thickness: 2px; }
 @media (min-width: 768px) {
   .section { padding-block: var(--s8); }
 
-  /* Buttons stop being full-bleed and sit side by side. */
-  .btn { width: auto; min-width: 16rem; }
-  .btn-stack { grid-auto-flow: column; justify-content: start; }
+  /* Buttons stop being full-bleed and sit side by side — but only where
+     they actually fit. The pair has to work both in the 672px contact
+     section and in the ~360px hero column, so the stack wraps on its own
+     container width rather than on the viewport width. Sized off the
+     viewport, the pair overflows the hero column and slides under the
+     photo. */
+  .btn { width: fit-content; min-width: 15rem; max-width: 100%; }
+
+  .btn-stack { display: flex; flex-wrap: wrap; }
+  .btn-stack .btn { flex: 0 1 auto; }
+
+  /* Hero gets more vertical air and goes 2-up, photo beside the text. */
+  #hero { padding-block: calc(var(--s8) * 1.5); }
+
+  .hero__grid {
+    /* minmax(0, …) rather than a bare fr: an fr track floors at min-content,
+       and the hero <h1> is wide enough at 3.25rem that it would starve the
+       photo column down to a sliver. */
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+    gap: var(--s7);
+    align-items: center;
+  }
+
+  .hero__photo { aspect-ratio: 4 / 5; }
+
+  /* Both sticky bars go away — a desktop user can see the whole page, so
+     the bars would only take space and repeat what is already on screen. */
+  .callbar, .topbar { display: none; }
+  body { padding-bottom: 0; }
 }
 
 /* --------------------------------------------------------------------------
-   9. Reduced motion
+   11. Reduced motion
    There is almost no motion here by design; this makes the little there is
    honour the preference.
    -------------------------------------------------------------------------- */

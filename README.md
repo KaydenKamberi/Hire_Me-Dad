@@ -5,9 +5,9 @@ no accounts to log into, no software to keep updated, no monthly fees for anythi
 except the web address itself.
 
 > **⚠️ This site is not finished and is not live to customers yet.**
-> It's at **CP2 — all eight sections exist, but every word on them is a
-> placeholder in double braces.** Nothing on it is true yet. See "Where the build
-> is up to" below.
+> It's at **CP3 — the hero and the call bars work, but every word on the page
+> is still a placeholder in double braces.** Nothing on it is true yet. See
+> "Where the build is up to" below.
 
 ---
 
@@ -36,7 +36,7 @@ the next one starts.
 - [x] **CP0** — Folder structure, questionnaire, preview hosting
 - [x] **CP1** — Colours, type, buttons
 - [x] **CP2** — Page structure, all eight sections
-- [ ] **CP3** — Hero and the sticky call bar
+- [x] **CP3** — Hero and the sticky call bar
 - [ ] **CP4** — About, services, photos, reviews, service area
 - [ ] **CP5** — Contact form *(see the warning below)*
 - [ ] **CP6** — 🔴 Your real words replace the placeholders
