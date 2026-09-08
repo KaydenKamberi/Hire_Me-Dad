@@ -4,7 +4,7 @@ Read this before doing anything. It governs every session in this repo.
 
 ## What this is
 
-A one-page "hire me" website for a tradesman. Its only job is to make a
+A four-page "hire me" website for a tradesman. Its only job is to make a
 stranger on a phone tap **Call**. Success is the phone ringing.
 
 Full specs live in `docs/`:
@@ -12,8 +12,28 @@ Full specs live in `docs/`:
 - `docs/build-spec.md` — the technical spec. Section numbers below (§2, §8…)
   refer to it. **This is the source of truth for every build decision.**
 - `docs/prd.md` — the what and why.
+- `docs/home.html`, `services.html`, `work.html`, `contact.html` — the approved
+  CP6 mockups. Visual reference only; their sample copy is not content.
 - `content/source-of-truth.md` — the client's real answers. The only place
   content comes from.
+- `BLOCKERS.md` — open items that code cannot fix. Read it before starting.
+
+## File map
+
+```
+index.html  services.html  work.html  contact.html   four flat pages, root
+css/styles.css      one stylesheet, token-driven, < 20KB
+js/main.js          progressive enhancement only, < 5KB
+assets/fonts/       self-hosted Archivo + Public Sans (variable, latin)
+assets/img/         real job photos, EXIF stripped
+content/            source-of-truth.md
+docs/               spec, PRD, approved mockups
+scripts/            optimize-images.sh
+```
+
+The top bar, footer, CTA band and call bar are duplicated in all four pages by
+design — no build step, no JS injection. Keep them byte-identical apart from
+the section nav's `aria-current`.
 
 ## Golden rules
 
@@ -27,13 +47,17 @@ These are not preferences. Breaking one is an automatic stop (see Escalation).
    Phone links are real `<a href="tel:">` in the HTML, never injected.
 4. **No stock photos, ever.** Missing images are flat gray blocks labeled
    `PHOTO NEEDED: [description]`. Never fill a gap with a stock image.
-5. **No external requests.** No Google Fonts, no CDN, no analytics, no
-   jQuery. System fonts and inline SVG only.
+5. **No external requests, and no webfont may be loaded from a third-party
+   host — fonts are self-hosted in `assets/fonts/`.** No Google Fonts link, no
+   CDN, no analytics, no jQuery. Inline SVG only.
 6. **All internal paths are relative** (`./css/styles.css`). The site runs on
    a GitHub Pages subpath now and a domain root later.
 7. **Host-agnostic until CP9.** No `netlify.toml`, no `data-netlify`
    attributes, nothing host-specific enters the repo before then.
-8. **`--accent` is only ever used for call/text buttons.** Nothing else.
+8. **`--accent` is only ever used for call/text actions.** As of CP6 that
+   means: call and text buttons, the header Call pill, the sticky bottom bar,
+   eyebrow rules and labels, credential-strip icons, the active nav underline,
+   and the Before/After "After" tag. Nowhere else.
 
 ## Working method
 
@@ -131,7 +155,7 @@ checkpoint that claims it passed when it didn't costs a day.
 
 ## Content placeholders
 
-Real content is absent until CP6. Use `{{TOKEN}}` form verbatim so it's
+Real content is absent until CP6-content. Use `{{TOKEN}}` form verbatim so it's
 greppable — `{{NAME}}`, `{{TRADE}}`, `{{AREA}}`, `{{YEARS}}`,
 `{{PHONE_DISPLAY}}`, `{{PHONE_RAW}}`, `{{EMAIL}}`, `{{LICENSE_LINE}}`,
 `{{GOOGLE_REVIEW_URL}}`, `{{WHATSAPP_RAW}}`, `{{DOMAIN}}`.

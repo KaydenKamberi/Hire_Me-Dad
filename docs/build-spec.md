@@ -12,7 +12,7 @@ Mobile is the design, desktop is the adaptation. Every decision starts at 375px 
 No framework, no build step, no npm. Plain HTML, CSS, and a small amount of vanilla JS. This site must still work in five years with zero maintenance.
 The page must fully render and be fully usable with JavaScript disabled. JS adds polish only. Phone numbers are real <a href="tel:"> links in the HTML, not injected.
 No stock photos, ever. If real photos aren't ready, use flat gray placeholder blocks labeled PHOTO NEEDED: [description]. Never fill the gap with a stock image "for now" — placeholders that look finished ship by accident.
-No external requests. No Google Fonts, no icon CDN, no analytics script, no jQuery. System fonts and inline SVG only. This is a performance requirement, not a preference.
+No external requests, and no webfont may be loaded from a third-party host — fonts are self-hosted in assets/fonts/ (amended at CP6). No Google Fonts link, no icon CDN, no analytics script, no jQuery. Inline SVG only. This is a performance requirement, not a preference.
 All internal paths are relative — ./css/styles.css, not /css/styles.css. The site is built and previewed on GitHub Pages, which serves from a subpath (username.github.io/dads-site/), and later moves to Netlify at a domain root. Relative paths work in both. Absolute paths break silently on GitHub Pages and you'll lose an hour to it.
 Host-agnostic until the very end. Nothing host-specific enters the repo until CP9. No netlify.toml, no data-netlify attributes, no Netlify redirects. The site must be a plain static folder that runs from any web server — or from a file:// double-click — for the entire build.
 1. Content source of truth
@@ -53,37 +53,49 @@ Define these as CSS custom properties on :root. Nothing in the stylesheet uses a
 
 css
 :root {
-  /* Color — dark neutral base + one strong accent for actions */
-  --ink:        #14181d;   /* body text, headings */
-  --ink-soft:   #4a5560;   /* secondary text */
-  --paper:      #ffffff;   /* page background */
-  --paper-alt:  #f4f5f7;   /* alternating section background */
-  --line:       #d9dde2;   /* borders, dividers */
-  --accent:     #0b5fd0;   /* ALL call/text buttons — one job only */
-  --accent-ink: #ffffff;   /* text on accent */
-  --accent-dark:#08419a;   /* accent pressed state */
-  --ok:         #1a7f47;   /* "Free estimates", checkmarks */
-
-  /* Type — system stack, zero network cost */
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial, sans-serif;
-
-  /* Fluid type scale (mobile → desktop) */
-  --t-hero:  clamp(2rem, 7vw, 3.25rem);
-  --t-h2:    clamp(1.5rem, 5vw, 2.125rem);
-  --t-h3:    clamp(1.125rem, 3.5vw, 1.375rem);
-  --t-body:  clamp(1.0625rem, 2.5vw, 1.125rem);
-  --t-small: 0.9375rem;
-
-  /* Spacing scale — 4px base */
-  --s1: .25rem; --s2: .5rem;  --s3: .75rem; --s4: 1rem;
-  --s5: 1.5rem; --s6: 2rem;   --s7: 3rem;   --s8: 4rem;
-
-  --radius: 10px;
-  --shadow: 0 2px 8px rgb(20 24 29 / .12);
-  --maxw: 720px;              /* single-column content max width */
-  --tap: 52px;                /* minimum interactive height */
+  /* dark surfaces */
+  --ink:        #0E1113;   /* page background, hero, dark sections */
+  --panel:      #14181B;   /* credential strip, cards, section nav */
+  --panel-deep: #0A0C0D;   /* footer */
+  --line:       rgba(255,255,255,.10);
+  --on-dark:        #FFFFFF;
+  --on-dark-soft:   rgba(255,255,255,.74);
+  --on-dark-muted:  rgba(255,255,255,.56);
+  --on-dark-faint:  rgba(255,255,255,.44);   /* non-text only — 4.39:1 on --ink */
+  /* light surfaces */
+  --bone:       #F4F2EF;
+  --bone-line:  #D7D1C9;
+  --on-light:       #14181B;
+  --on-light-soft:  #4A5359;
+  --on-light-faint: #7C858B;                 /* non-text only — 3.37:1 on --bone */
+  /* accent — CALL/TEXT ACTIONS ONLY */
+  --accent:      #FF6B1A;
+  --accent-ink:  #0E1113;
+  --accent-deep: #A8470A;   /* accent text on light backgrounds only. CP6 was
+                               handed #C2540C, which is 4.11:1 on --bone and
+                               under the §8 floor; darkened to 5.26:1. */
+  /* type */
+  --display: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --body:    'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --t-hero:    clamp(2.875rem, 11.8vw, 4rem);
+  --t-page-h1: clamp(2.375rem, 9.7vw, 3rem);
+  --t-h2:      clamp(1.8125rem, 7.4vw, 2.25rem);
+  --t-h3:      1.125rem;
+  --t-body:    1rem;
+  --t-small:   0.90625rem;
+  --t-eyebrow: 0.6875rem;
+  --gutter: 22px;
+  --tap: 52px;
+  --btn: 58px;
 }
+
+Replaced wholesale at CP6 — the former blue/system-font set is gone, not
+evolved. Fonts are self-hosted (§0 rule 5, as amended). Square corners
+throughout: no border-radius anywhere on this site.
+
+--accent is confined to call and text buttons, the header Call pill, the sticky
+bottom bar, eyebrow rules and labels, credential-strip icons, the active nav
+underline, and the Before/After "After" tag. Nowhere else.
 
 Accent color note: --accent is reserved exclusively for call/text actions. If a non-action element uses the accent color, the call button stops being the obvious thing to tap. This is the single most important visual rule on the page.
 
@@ -196,79 +208,83 @@ Desktop (768px+) differences: hero photo sits beside the text in a 2-column grid
 
 3. File structure
 dads-site/
-├── index.html                  # The entire site. One file.
+├── index.html                  # home
+├── services.html               # CP6: four flat pages, no subfolders
+├── work.html
+├── contact.html
 ├── css/
-│   └── styles.css              # All styles. One file. Token-driven.
+│   └── styles.css              # all styles, one file, token-driven
 ├── js/
-│   └── main.js                 # < 4KB. Progressive enhancement only.
+│   └── main.js                 # < 5KB, progressive enhancement only
 ├── assets/
+│   ├── fonts/                      # CP6: self-hosted, latin subset
+│   │   ├── archivo.woff2           # variable — one file covers 700 and 800
+│   │   └── public-sans.woff2       # variable — one file covers 400 and 600
 │   ├── img/
-│   │   ├── dad-hero.webp           # + .jpg fallback
-│   │   ├── work-01-before.webp
-│   │   ├── work-01-after.webp
-│   │   ├── work-02-before.webp
-│   │   └── ...                     # numbered, never renamed after launch
-│   ├── og-image.jpg                # 1200×630 social preview
+│   ├── og-image.jpg
 │   ├── favicon.ico
-│   └── apple-touch-icon.png        # 180×180
+│   └── apple-touch-icon.png
 ├── content/
-│   └── source-of-truth.md      # Dad's answers. The ONLY content source.
+│   └── source-of-truth.md
+├── docs/                       # spec, PRD, approved mockups
 ├── scripts/
-│   └── optimize-images.sh      # cwebp + resize batch script
+│   └── optimize-images.sh
 ├── netlify.toml                # ⚠ ADDED AT CP9 ONLY — not before
-├── .nojekyll                   # GitHub Pages: skip Jekyll processing
+├── .nojekyll
 ├── robots.txt
 ├── sitemap.xml
 ├── .gitignore
+├── BLOCKERS.md                 # open items that code cannot fix
+├── CLAUDE.md                   # governs every session in this repo
 ├── README.md                   # handover doc, written FOR DAD
 └── HANDOVER.md                 # accounts, logins, renewal dates
 
 Deliberately absent: package.json, node_modules, any bundler config, any framework. If a checkpoint seems to need one, the checkpoint is wrong.
 
-4. index.html structure
-html
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{NAME}} — {{TRADE}} in {{AREA}} | Free Estimates</title>
-  <meta name="description" content="...155 chars, includes trade + area + phone">
-  <link rel="canonical" href="https://{{DOMAIN}}/">   <!-- set at CP9 -->
-  <!-- OG + Twitter card tags -->
-  <!-- LocalBusiness JSON-LD (see §5) -->
-  <link rel="stylesheet" href="./css/styles.css">
-</head>
-<body>
-  <a class="skip" href="#main">Skip to content</a>
-  <header class="topbar" hidden>…</header>   <!-- revealed by JS on scroll -->
-  <main id="main">
-    <section id="hero">…</section>
-    <section id="about">…</section>
-    <section id="services">…</section>
-    <section id="work">…</section>
-    <section id="reviews">…</section>
-    <section id="area">…</section>
-    <section id="contact">…</section>
-  </main>
-  <footer>…</footer>
-  <div class="callbar">…</div>               <!-- CSS-only sticky, no JS -->
-  <script src="./js/main.js" defer></script>
-</body>
-</html>
+4. Page structure (rewritten at CP6)
 
-Semantic HTML throughout: one <h1> (the hero name), <h2> per section, <ul> for services and area, <blockquote> + <cite> for testimonials, <figure>/<figcaption> for before/after pairs.
+Four flat pages at the repo root — index.html, services.html, work.html,
+contact.html. No subfolders for pages; every internal path stays relative.
+
+Each page is: skip link → top bar → [section nav, inner pages only] → <main>
+(page sections, then the CTA band) → footer → sticky bottom call bar → script.
+
+The top bar, footer, CTA band and call bar are duplicated verbatim in all four
+files. There is no build step and the page must work with JS off, so no
+includes and no JS injection — four copies is the decision. They are kept
+byte-identical apart from the section nav's aria-current.
+
+  index.html     hero → credential strip → reviews marquee → recent work →
+                 about. No section nav; the hero does that job.
+  services.html  photo page-header → numbered service list → service area
+  work.html      photo page-header → before/after pairs → more-jobs grid
+  contact.html   header → three contact rows → form → hours strip
+
+The CTA band sits inside <main>, above the footer, with different headline copy
+per page. It is page content, and outside a landmark an accessibility audit
+flags it.
+
+Semantic HTML throughout: one <h1> per page, <h2> per section, <ul> for the
+service list, service area, credential strip and nav, <figure>/<figcaption> for
+before/after pairs, work tiles and review cards. Where a section's heading
+would be visual noise, it is present and .sr-only rather than absent — a
+skipped heading level fails the §8 accessibility budget.
+
+Supersedes the single-page structure this section described before CP6.
 
 What main.js is allowed to do
 
-Exactly four things, ~60 lines total:
+Three things, and it is not load-bearing for any of them:
 
-Reveal the sticky top bar once the hero scrolls out of view (IntersectionObserver).
-Smooth-scroll for the one or two in-page anchor links.
-Client-side form validation — phone format, required fields — with inline error text, never an alert().
-Swap the submit button to a "Sending…" state and show a success message in place of the form after a successful submit.
+1. Hide the sticky bottom call bar while the page header is on screen. The bar
+   is visible by default in CSS, so with JS off it is simply always there,
+   which is the safe failure.
+2. Client-side form validation — inline errors, never an alert().
+3. Swap the submit button to a sending state and show the success message in
+   place of the form.
 
-If it's doing anything else, delete it.
+If it is doing anything else, delete it.
+
 
 5. SEO & local discovery
 JSON-LD LocalBusiness in <head>: name, telephone, image, areaServed (array of cities), priceRange, url, and openingHours if Dad gives them. This is what feeds "handyman near me" results.
@@ -391,7 +407,7 @@ CP1 — Design tokens & base stylesheet
 
 css/styles.css with the §2.2 tokens, a modern reset, base typography, the button components, and section rhythm. No page content yet. Exit: a test page renders both buttons, all headings, and a testimonial card correctly at 375px and 1280px. Contrast checked.
 
-CP2 — HTML skeleton, all 8 sections
+CP2 — HTML skeleton, all 8 sections — SUPERSEDED BY CP6
 
 Full semantic structure with {{TOKEN}} placeholders and gray PHOTO NEEDED blocks. Real tel: and sms: links using {{PHONE_RAW}}. Exit: page scrolls top to bottom on a phone; every section present in order; heading hierarchy validates; zero console errors.
 
@@ -399,7 +415,7 @@ CP3 — Hero + sticky call bars
 
 Hero laid out per the wireframe, CSS-only sticky bottom bar, JS-revealed top bar. Body bottom padding correct. Exit: primary Call button is fully visible at 375×667 without scrolling; bottom bar never covers footer content; tapping Call opens the dialer on a real phone.
 
-CP4 — Content sections
+CP4 — Content sections — SUPERSEDED BY CP6
 
 About, Services, Gallery, Testimonials, Service Area built out. CTA repeats placed after Services and in Contact. Exit: three call CTAs present and reachable; gallery grid correct at both breakpoints; no layout shift as images load.
 
@@ -407,7 +423,19 @@ CP5 — Contact form (markup + behavior only)
 
 Build the form per §6 Stage 1: fields, labels, styling, validation JS, success state, honeypot. Submission is deliberately not wired — action="#" with JS intercepting submit. Exit: validation catches empty and malformed input with inline errors; success state renders; keyboard and screen-reader accessible; native HTML validation still fires with JS disabled; the TODO CP9 comment is in place above the form.
 
-CP6 — Real content pass 🔴
+CP6 — Multi-page redesign
+
+Replaces the single-page site with four pages and a new visual system: dark
+--ink/--bone surfaces, an orange call accent, self-hosted Archivo and Public
+Sans, square corners. Supersedes CP2 and CP4. Exit: all four pages load and
+link to each other; the header Call pill and the sticky bottom bar both work;
+the section nav shows the correct active item; the reviews marquee loops with
+no jump, measured rather than eyeballed; no Google Fonts request; every page
+renders fully with JavaScript disabled and native form validation still fires;
+no horizontal scroll at 375px; CSS under 20KB, JS under 5KB, Lighthouse mobile
+Accessibility 100.
+
+CP6-content — Real content pass 🔴
 
 Replace every {{TOKEN}} with Dad's real answers. Run the license branch (§1) and delete the unused wording. Write the real hero headline, About paragraph, and service list. Exit: grep -r "{{" . outside source-of-truth.md returns nothing. License wording matches actual status. Dad has read and approved every word.
 
