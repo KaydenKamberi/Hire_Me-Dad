@@ -5,10 +5,10 @@ no accounts to log into, no software to keep updated, no monthly fees for anythi
 except the web address itself.
 
 > **⚠️ This site is not finished and is not live to customers yet.**
-> It's at **CP5 — the whole page is built, including the contact form, but
-> every word on it is still a placeholder in double braces and every photo is a
-> grey box.** Nothing on it is true yet, and **the form does not send anything**
-> — see the warning below.
+> It's at **CP6 — the site has been redesigned into four pages and every part
+> of it is built, but every word on it is still a placeholder in double braces
+> and every photo is a grey box.** Nothing on it is true yet, and **the form
+> does not send anything** — see the warning below.
 
 ---
 
@@ -16,10 +16,14 @@ except the web address itself.
 
 | Folder / file | What it is |
 |---|---|
-| `index.html` | The website. All of it — it's a single page. |
+| `index.html` | The home page. |
+| `services.html` | What he takes on, and where he works. |
+| `work.html` | Before and after photos. |
+| `contact.html` | Phone, text, email and the message form. |
 | `css/styles.css` | How the page looks. Colours, type sizes, spacing. |
 | `js/main.js` | A small amount of code for polish. The site works fine without it. |
 | `assets/img/` | The photos. |
+| `assets/fonts/` | The two typefaces, kept here so the site never asks another company's server for them. |
 | `content/source-of-truth.md` | **Your answers.** Everything on the site comes from this file. |
 | `scripts/optimize-images.sh` | Shrinks photos before they go on the site. |
 
@@ -40,7 +44,8 @@ the next one starts.
 - [x] **CP3** — Hero and the sticky call bar
 - [x] **CP4** — About, services, photos, reviews, service area
 - [x] **CP5** — Contact form *(see the warning below)*
-- [ ] **CP6** — 🔴 Your real words replace the placeholders
+- [x] **CP6** — Redesign: four pages, new colours and type
+- [ ] **CP6-content** — 🔴 Your real words replace the placeholders
 - [ ] **CP7** — 🔴 Your real photos replace the grey boxes
 - [ ] **CP8** — Speed and accessibility check, then **you approve it**
 - [ ] **CP9** — Moves to its real web address and goes live
@@ -97,8 +102,8 @@ spec in full; the short version:
   It must still work in five years with nobody maintaining it.
 - **The page must fully work with JavaScript turned off.** JS is polish only. Phone
   numbers are real `<a href="tel:">` links in the HTML.
-- **No external requests.** No web fonts, no icon CDN, no analytics, no jQuery.
-  System fonts and inline SVG.
+- **No external requests.** No icon CDN, no analytics, no jQuery. Fonts are
+  self-hosted in `assets/fonts/`; inline SVG for everything else.
 - **All internal paths are relative** (`./css/styles.css`). The preview is served
   from a subpath and the live site from a domain root — relative paths work in both,
   absolute ones break silently on the preview.
@@ -106,6 +111,5 @@ spec in full; the short version:
 - **Host-agnostic until CP9.** Nothing host-specific — no `netlify.toml`, no
   `data-netlify` attributes — enters this repo before then.
 
-`styleguide.html` is a build tool, not a page of the site: it renders every
-component against the stylesheet so CP1 could be checked at 375px and 1280px.
-It's noindexed and nothing links to it. **Delete it at CP8.**
+The header and footer are copied into all four pages on purpose. There's no
+build step to share them, so if you change one, change all four.

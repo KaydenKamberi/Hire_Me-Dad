@@ -150,20 +150,23 @@ he'll do for the customer, not with a claim about himself.*
 
 ---
 
-### 🔴 `{{SERVICE_1}}` … `{{SERVICE_8}}` — 6 to 8 things he does
+### 🔴 `{{SERVICE_1}}` … `{{SERVICE_6}}` + `{{SERVICE_n_DESC}}` — 6 things he does
 *A checkmark list. **If it's not on the list, he doesn't do it** — so don't pad it.
 Better to have six things he's genuinely good at than ten that invite calls he'll
 turn down.*
 
+*Each row also carries one line of description — what it actually covers.*
+
 **Answer:**
-1.
-2.
-3.
-4.
-5.
-6.
-7.
-8.
+
+| # | Service (`{{SERVICE_n}}`) | One line of detail (`{{SERVICE_n_DESC}}`) |
+|---|---|---|
+| 1 | | |
+| 2 | | |
+| 3 | | |
+| 4 | | |
+| 5 | | |
+| 6 | | |
 
 ---
 
@@ -177,6 +180,10 @@ the page closes with "Not sure if you're in my area? Just call and ask."*
 ---
 
 ### 🔴 `{{QUOTE_n}}` / `{{QUOTE_n_WHO}}` — 3 to 5 real quotes
+*The home page marquee shows **four** and loops them, so four is the number to
+aim for. If only two are real, we ship two and the loop distance is recomputed —
+a wrong distance makes the scroll visibly jump.*
+
 *Real customers, real words, first name + city. **Permission is required for each
 one.** No composites, no "representative" quotes, nothing written on their behalf.
 If we only have two real ones, we ship two.*
@@ -225,6 +232,42 @@ break.*
 
 ### 🟡 Price range — the `$`–`$$$$` band for JSON-LD
 *Not a price list. The site quotes nothing; estimates are free and given by phone.*
+
+**Answer:**
+
+---
+
+### 🔴 `{{HERO_BODY}}` — the one paragraph under the hero headline
+*One or two sentences. What he does, where, and that estimates are free. This
+is the first thing a stranger reads after the headline, so it is his pitch in
+plain words — not a list of services.*
+
+**Answer:**
+
+---
+
+### 🔴 `{{JOB_1..6_TITLE}}` / `{{JOB_1..6_CITY}}` — the six jobs shown by name
+*Jobs 1–3 are the tiles on the home page. Jobs 4–6 are the before/after pairs
+on the work page, so those three need both a before and an after photo of the
+same room from the same angle.*
+
+**Answer:**
+
+| # | Where it appears | Job title | City |
+|---|---|---|---|
+| 1 | Home, large tile | | |
+| 2 | Home, small tile | | |
+| 3 | Home, small tile | | |
+| 4 | Work, before/after | | |
+| 5 | Work, before/after | | |
+| 6 | Work, before/after | | |
+
+---
+
+### 🟡 `{{HOURS}}` — hours, only if he wants to commit to them
+*Shown on the contact page above "Calls after hours get returned the next
+morning." If he would rather people call whenever, say so and this row comes
+out entirely — better than publishing hours he will break.*
 
 **Answer:**
 
