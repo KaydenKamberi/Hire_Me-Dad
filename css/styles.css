@@ -339,6 +339,55 @@ a:hover { text-decoration-thickness: 2px; }
   mask: var(--check) center / contain no-repeat;
 }
 
+/* Gallery. Each <figure> is one job: a before/after pair, or a single shot.
+   Stacked on mobile, two-up at 768px+ with the caption spanning both.
+
+   .shot fixes the aspect ratio rather than letting each photo set its own.
+   That does two things: the grid stays even across photos shot at different
+   ratios, and the box reserves its height before anything loads, so swapping
+   the placeholder for a real <picture> at CP7 shifts nothing. */
+.gallery { display: grid; gap: var(--s6); }
+
+/* minmax(0, …) on every track, not a bare 1fr or an implicit auto column.
+   A grid track floors at the min-content width of what's inside it, and the
+   placeholder caption is wide enough to push a shot past its container —
+   111px of horizontal overflow at 375px before this was pinned down. The
+   same trap cost the hero its photo column at CP3. */
+.pair, .single {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s3);
+}
+
+.shot { position: relative; aspect-ratio: 4 / 3; }
+
+.shot > * { width: 100%; height: 100%; }
+
+.shot img { object-fit: cover; border-radius: var(--radius); }
+
+/* Before / After pill, top-left over the photo. --ink rather than --accent:
+   a label is not an action, and accent belongs to the call buttons. */
+.shot__label {
+  position: absolute;
+  top: var(--s3);
+  left: var(--s3);
+  z-index: 1;
+  width: auto;
+  height: auto;
+  padding: var(--s1) var(--s3);
+  background: var(--ink);
+  color: var(--ink-invert);
+  border-radius: 999px;
+  font-size: var(--t-small);
+  font-weight: 600;
+}
+
+.gallery figcaption {
+  grid-column: 1 / -1;
+  font-size: var(--t-small);
+  color: var(--ink-soft);
+}
+
 /* Comma-separated service-area text, and other plain inline lists. */
 .inline-list { display: inline; }
 .inline-list li { display: inline; }
@@ -520,6 +569,11 @@ body {
   }
 
   .hero__photo { aspect-ratio: 4 / 5; }
+
+  /* Gallery goes two-up. A single shot takes one of the two columns rather
+     than stretching across both, so every photo on the page reads at the
+     same scale. */
+  .pair, .single { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   /* Both sticky bars go away — a desktop user can see the whole page, so
      the bars would only take space and repeat what is already on screen. */

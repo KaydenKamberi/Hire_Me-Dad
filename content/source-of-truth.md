@@ -167,9 +167,10 @@ turn down.*
 
 ---
 
-### 🔴 `{{AREA_LIST}}` — every city and neighborhood he'll drive to
-*Plain comma-separated text on the site, not a map. List them all here; the page
-closes with "Not sure if you're in my area? Just call and ask."*
+### 🔴 `{{AREA_1}}` … `{{AREA_6}}` — every city and neighborhood he'll drive to
+*Plain comma-separated text on the site, not a map. One entry per city — the
+page has six slots and CP6 adds or removes them to match. List them all here;
+the page closes with "Not sure if you're in my area? Just call and ask."*
 
 **Answer:**
 
