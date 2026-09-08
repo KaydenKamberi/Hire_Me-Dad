@@ -1,31 +1,33 @@
 /* main.js — progressive enhancement only.
  *
  * The page is fully usable with this file blocked, failed, or disabled:
- * every phone number is a real <a href="tel:"> in the HTML, and the sticky
- * bottom call bar is CSS-only. Nothing here is load-bearing.
+ * every phone number is a real <a href="tel:"> in the HTML, the top bar is
+ * CSS-sticky, and the bottom call bar defaults to visible. Nothing here is
+ * load-bearing.
  *
- * Spec §4 allows this file exactly four jobs. Smooth-scrolling still has no
- * in-page anchor to act on besides the skip link, which should jump
- * instantly. So there are three:
- *
- *   1. Reveal the sticky top bar once the hero scrolls out of view.
+ * Three jobs:
+ *   1. Hide the sticky bottom call bar while the page header is still on
+ *      screen — the header carries its own Call button, so the bar would
+ *      only repeat it.
  *   2. Validate the estimate form inline. Never an alert().
  *   3. Swap the submit button to a sending state, then show the success
  *      message in place of the form.
  */
+
+/* --- 1. Sticky bottom call bar ------------------------------------------
+ * The bar is visible by default in CSS so that with JS off it is simply
+ * always there, which is the safe failure. This only ever *hides* it.
+ */
 (function () {
   'use strict';
 
-  var hero = document.getElementById('hero');
-  var topbar = document.querySelector('.topbar');
-
-  // No IntersectionObserver, no hero, no topbar — leave the bar hidden. The
-  // hero's own Call button and the CSS-only bottom bar still do the work.
-  if (!hero || !topbar || !('IntersectionObserver' in window)) return;
+  var bar = document.querySelector('.callbar');
+  var trigger = document.querySelector('[data-bar-trigger]');
+  if (!bar || !trigger || !('IntersectionObserver' in window)) return;
 
   new IntersectionObserver(function (entries) {
-    topbar.hidden = entries[0].isIntersecting;
-  }).observe(hero);
+    bar.hidden = entries[0].isIntersecting;
+  }).observe(trigger);
 })();
 
 /* --- 2 & 3. Estimate form -------------------------------------------------
