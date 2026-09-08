@@ -27,8 +27,9 @@ These are not preferences. Breaking one is an automatic stop (see Escalation).
    Phone links are real `<a href="tel:">` in the HTML, never injected.
 4. **No stock photos, ever.** Missing images are flat gray blocks labeled
    `PHOTO NEEDED: [description]`. Never fill a gap with a stock image.
-5. **No external requests.** No Google Fonts, no CDN, no analytics, no
-   jQuery. System fonts and inline SVG only.
+5. **No external requests, and no webfont may be loaded from a third-party
+   host — fonts are self-hosted in `assets/fonts/`.** No Google Fonts link, no
+   CDN, no analytics, no jQuery. Inline SVG only.
 6. **All internal paths are relative** (`./css/styles.css`). The site runs on
    a GitHub Pages subpath now and a domain root later.
 7. **Host-agnostic until CP9.** No `netlify.toml`, no `data-netlify`

@@ -1,653 +1,370 @@
-/* ==========================================================================
-   Dad's hire-me site — base stylesheet
-   Built at CP1. Tokens, reset, typography, buttons, section rhythm.
-   No page-specific content styling yet.
-
-   Rules this file lives by (build spec §0, §2):
-   - Mobile is the design; 768px is the only breakpoint.
-   - No raw colours, no raw spacing values. Everything comes from a token.
-   - --accent belongs to call/text actions. Nothing else competes with it.
-   - No @import, no web fonts, no external requests of any kind.
-   ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. Tokens
-   -------------------------------------------------------------------------- */
-
-:root {
-  /* Color — dark neutral base + one strong accent for actions */
-  --ink:        #14181d;   /* body text, headings */
-  --ink-soft:   #4a5560;   /* secondary text */
-  --paper:      #ffffff;   /* page background */
-  --paper-alt:  #f4f5f7;   /* alternating section background */
-  --line:       #d9dde2;   /* borders, dividers */
-  /* Note for CP5: --line is 1.36:1 on --paper. Fine for a decorative card
-     edge, NOT enough for a form input border, which WCAG 1.4.11 holds to
-     3:1 because the field's boundary carries meaning. Form inputs use
-     --ink-soft (7.6:1). Do not reach for --line there. */
-  --accent:     #0b5fd0;   /* ALL call/text buttons — one job only */
-  --accent-ink: #ffffff;   /* text on accent */
-  --accent-dark:#08419a;   /* accent pressed state */
-  --ok:         #1a7f47;   /* "Free estimates", checkmarks */
-
-  /* Type — system stack, zero network cost */
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial, sans-serif;
-
-  /* Fluid type scale (mobile → desktop) */
-  --t-hero:  clamp(2rem, 7vw, 3.25rem);
-  --t-h2:    clamp(1.5rem, 5vw, 2.125rem);
-  --t-h3:    clamp(1.125rem, 3.5vw, 1.375rem);
-  --t-body:  clamp(1.0625rem, 2.5vw, 1.125rem);
-  --t-small: 0.9375rem;
-
-  /* Spacing scale — 4px base */
-  --s1: .25rem; --s2: .5rem;  --s3: .75rem; --s4: 1rem;
-  --s5: 1.5rem; --s6: 2rem;   --s7: 3rem;   --s8: 4rem;
-
-  --radius: 10px;
-  --shadow: 0 2px 8px rgb(20 24 29 / .12);
-  --maxw: 720px;              /* single-column content max width */
-  --tap: 52px;                /* minimum interactive height */
-}
-
-/* Derived tokens — additions beyond spec §2.2, needed so that no rule below
-   has to reach for a raw value. Each one is a role, not a new colour idea. */
-:root {
-  --ink-invert:      #ffffff;  /* headings on the dark footer */
-  --ink-invert-soft: #c8ced6;  /* body text on the dark footer — 11.2:1 */
-  --line-invert:     #333c46;  /* dividers on the dark footer */
-
-  --error:      #b42318;       /* form validation — 6.6:1 on --paper */
-
-  --focus-ring: var(--ink);    /* deliberately NOT --accent, so a focus ring
-                                  never reads as a call-to-action */
-  --focus-width: 3px;
-  --focus-offset: 3px;
-
-  /* Sticky bar heights. --callbar-h is derived from the tap target and its
-     padding rather than hard-coded, so <body>'s bottom padding can never
-     drift out of sync with the bar and let it cover the footer. */
-  --topbar-h: 56px;
-  --callbar-h: calc(var(--tap) + var(--s2) * 2);
-
-  /* Checkmark glyph, inlined as a mask so the list markers need no icon
-     font and no network request. */
-  --check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9.6 17.4 4.2 12l1.7-1.7 3.7 3.7 8.5-8.5L19.8 7.2z'/%3E%3C/svg%3E");
-}
-
-/* --------------------------------------------------------------------------
-   2. Reset
-   -------------------------------------------------------------------------- */
-
-*, *::before, *::after { box-sizing: border-box; }
-
-html {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-  /* Keeps an anchored heading from landing underneath the fixed top bar. */
-  scroll-padding-top: calc(var(--topbar-h) + var(--s3));
-}
-
-body,
-h1, h2, h3, h4, p, figure, blockquote, ul, ol, dl, dd {
-  margin: 0;
-}
-
-ul[class], ol[class] {
-  padding: 0;
-  list-style: none;
-}
-
-img, picture, svg, video {
-  display: block;
-  max-width: 100%;
-}
-
-/* Explicit width/height on every <img> prevents layout shift (spec §7);
-   this keeps the image responsive without discarding that ratio. */
-img { height: auto; }
-
-input, button, textarea, select {
-  font: inherit;
-  color: inherit;
-}
-
-button { background: none; border: none; }
-
-/* Kills the grey flash on tap without removing any focus affordance. */
-a, button { -webkit-tap-highlight-color: transparent; }
-
-/* --------------------------------------------------------------------------
-   3. Base typography
-   -------------------------------------------------------------------------- */
-
-body {
-  font-family: var(--font);
-  font-size: var(--t-body);
-  line-height: 1.6;
-  color: var(--ink);
-  background: var(--paper);
-}
-
-h1, h2, h3 {
-  line-height: 1.15;
-  font-weight: 700;
-  text-wrap: balance;          /* progressive enhancement; ignored if unknown */
-}
-
-h1 { font-size: var(--t-hero); line-height: 1.05; letter-spacing: -0.02em; }
-h2 { font-size: var(--t-h2); letter-spacing: -0.01em; }
-h3 { font-size: var(--t-h3); }
-
-p { text-wrap: pretty; }
-
-p + p { margin-top: var(--s4); }
-
-strong, b { font-weight: 700; }
-
-small, .t-small { font-size: var(--t-small); }
-
-.t-soft { color: var(--ink-soft); }
-
-/* Body links. Not accent — accent is reserved for call/text buttons, and a
-   run of blue inline links would blunt it. Underlined dark text instead. */
-a {
-  color: var(--ink);
-  text-underline-offset: 0.15em;
-  text-decoration-thickness: 1px;
-}
-
-a:hover { text-decoration-thickness: 2px; }
-
-/* One exception: a standalone text link that acts as a soft CTA — the
-   "Read reviews on Google" link in §2.5. Still not a button. */
-.link-out {
-  display: inline-block;
-  min-height: var(--tap);
-  line-height: var(--tap);
-  font-weight: 600;
-}
-
-/* --------------------------------------------------------------------------
-   4. Focus
-   Every interactive element gets a visible ring. The ring is offset so that
-   on an accent-filled button it lands on the page background, where it has
-   full contrast, rather than disappearing into the blue.
-   -------------------------------------------------------------------------- */
-
-:focus-visible {
-  outline: var(--focus-width) solid var(--focus-ring);
-  outline-offset: var(--focus-offset);
-  border-radius: var(--s1);
-}
-
-/* Skip link — offscreen until focused, then pinned to the top-left. */
-.skip {
-  position: absolute;
-  left: var(--s4);
-  top: var(--s4);
-  z-index: 100;
-  padding: var(--s3) var(--s4);
-  background: var(--paper);
-  color: var(--ink);
-  border: 2px solid var(--ink);
-  border-radius: var(--radius);
-  font-weight: 600;
-  transform: translateY(calc(-100% - var(--s6)));
-}
-
-.skip:focus { transform: translateY(0); }
-
-/* Visually hidden, still read aloud. */
-.sr-only {
-  position: absolute;
-  width: 1px; height: 1px;
-  padding: 0; margin: -1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-/* --------------------------------------------------------------------------
-   5. Layout & section rhythm
-   One column at every breakpoint. Sections alternate paper / paper-alt so
-   scroll position stays legible.
-   -------------------------------------------------------------------------- */
-
-.wrap {
-  width: 100%;
-  max-width: var(--maxw);
-  margin-inline: auto;
-  padding-inline: var(--s5);
-}
-
-.section {
-  padding-block: var(--s7);
-  background: var(--paper);
-}
-
-.section--alt { background: var(--paper-alt); }
-
-/* Section header: heading plus the 48×4 rule beneath it. */
-.section-title {
-  font-size: var(--t-h2);
-  color: var(--ink);
-  text-align: left;
-  margin-bottom: var(--s5);
-}
-
-.section-title::before {
-  content: "";
-  display: block;
-  width: 48px;
-  height: 4px;
-  margin-bottom: var(--s4);
-  background: var(--accent);
-  border-radius: 2px;
-}
-
-/* Vertical rhythm between blocks inside a section. */
-.stack > * + * { margin-top: var(--s4); }
-.stack-lg > * + * { margin-top: var(--s5); }
-
-/* --------------------------------------------------------------------------
-   6. Buttons
-   Primary = Call. Secondary = Text / WhatsApp. Nothing else may use --accent.
-   -------------------------------------------------------------------------- */
-
-.btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--s3);
-  width: 100%;
-  min-height: var(--tap);
-  padding: var(--s3) var(--s5);
-  border-radius: var(--radius);
-  font-size: 1.125rem;          /* 18px, per spec §2.4 */
-  font-weight: 600;
-  line-height: 1.2;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background-color .12s ease, border-color .12s ease;
-}
-
-.btn svg {
-  width: 1.25em;
-  height: 1.25em;
-  flex: none;
-  fill: currentColor;
-}
-
-.btn--primary {
-  background: var(--accent);
-  color: var(--accent-ink);
-  border: 2px solid var(--accent);
-  box-shadow: var(--shadow);
-}
-
-.btn--primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
-.btn--primary:active { background: var(--accent-dark); border-color: var(--accent-dark); }
-
-.btn--secondary {
-  background: transparent;
-  color: var(--accent);
-  border: 2px solid var(--accent);
-}
-
-.btn--secondary:hover { background: var(--accent); color: var(--accent-ink); }
-.btn--secondary:active { background: var(--accent-dark); border-color: var(--accent-dark); color: var(--accent-ink); }
-
-/* Call above, text below — the stacked pair from the wireframe. */
-.btn-stack { display: grid; gap: var(--s3); }
-
-/* --------------------------------------------------------------------------
-   7. Small components
-   -------------------------------------------------------------------------- */
-
-/* Trust strip under the hero headline: "22+ years · Free estimates · …" */
-.trust {
-  font-size: var(--t-small);
-  color: var(--ink-soft);
-  line-height: 1.5;
-}
-
-.trust strong { color: var(--ink); }
-
-/* Checkmark list — services, and anywhere a "yes, included" list appears. */
-.checklist { display: grid; gap: var(--s3); }
-
-/* The marker is positioned rather than laid out as a grid/flex cell. If the
-   item were a grid container, every inline element inside it — a <strong>,
-   a link — would be promoted to its own column and the text would fragment.
-   Positioning it lets a list item hold arbitrary inline markup. */
-.checklist li {
-  position: relative;
-  padding-left: 2em;
-}
-
-.checklist li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: .2em;
-  width: 1.25em;
-  height: 1.25em;
-  background: var(--ok);
-  /* Inline checkmark as a mask — no icon font, no network request. */
-  -webkit-mask: var(--check) center / contain no-repeat;
-  mask: var(--check) center / contain no-repeat;
-}
-
-/* Gallery. Each <figure> is one job: a before/after pair, or a single shot.
-   Stacked on mobile, two-up at 768px+ with the caption spanning both.
-
-   .shot fixes the aspect ratio rather than letting each photo set its own.
-   That does two things: the grid stays even across photos shot at different
-   ratios, and the box reserves its height before anything loads, so swapping
-   the placeholder for a real <picture> at CP7 shifts nothing. */
-.gallery { display: grid; gap: var(--s6); }
-
-/* minmax(0, …) on every track, not a bare 1fr or an implicit auto column.
-   A grid track floors at the min-content width of what's inside it, and the
-   placeholder caption is wide enough to push a shot past its container —
-   111px of horizontal overflow at 375px before this was pinned down. The
-   same trap cost the hero its photo column at CP3. */
-.pair, .single {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--s3);
-}
-
-.shot { position: relative; aspect-ratio: 4 / 3; }
-
-.shot > * { width: 100%; height: 100%; }
-
-.shot img { object-fit: cover; border-radius: var(--radius); }
-
-/* Before / After pill, top-left over the photo. --ink rather than --accent:
-   a label is not an action, and accent belongs to the call buttons. */
-.shot__label {
-  position: absolute;
-  top: var(--s3);
-  left: var(--s3);
-  z-index: 1;
-  width: auto;
-  height: auto;
-  padding: var(--s1) var(--s3);
-  background: var(--ink);
-  color: var(--ink-invert);
-  border-radius: 999px;
-  font-size: var(--t-small);
-  font-weight: 600;
-}
-
-.gallery figcaption {
-  grid-column: 1 / -1;
-  font-size: var(--t-small);
-  color: var(--ink-soft);
-}
-
-/* Comma-separated service-area text, and other plain inline lists. */
-.inline-list { display: inline; }
-.inline-list li { display: inline; }
-.inline-list li:not(:last-child)::after { content: ", "; }
-
-/* Testimonial card */
-.card {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: var(--s5);
-}
-
-.card blockquote {
-  font-size: var(--t-body);
-  font-style: italic;
-}
-
-.card cite {
-  display: block;
-  margin-top: var(--s3);
-  font-size: var(--t-small);
+/* Dad's site — CP6 redesign. Four pages, one stylesheet.
+   Tokens only: no raw hex below :root. Square corners everywhere. */
+
+/* ---------- fonts: self-hosted, no third-party request ---------- */
+/* Both families are variable, so one file covers every weight we use. */
+@font-face {
+  font-family: 'Archivo';
   font-style: normal;
-  color: var(--ink-soft);
+  font-weight: 700 800;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url('../assets/fonts/archivo.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 400 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url('../assets/fonts/public-sans.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-/* --- Estimate form -------------------------------------------------------
-   Inputs border in --ink-soft (7.6:1), not --line (1.36:1): a field boundary
-   carries meaning, so WCAG 1.4.11 holds it to 3:1. */
-
-.hp { display: none; }
-
-.field { display: grid; gap: var(--s2); }
-
-.field label { font-weight: 600; }
-
-.field input,
-.field textarea {
-  width: 100%;
-  padding: var(--s3);
-  background: var(--paper);
-  color: var(--ink);
-  border: 2px solid var(--ink-soft);
-  border-radius: var(--radius);
+:root {
+  /* dark surfaces */
+  --ink:        #0E1113;
+  --panel:      #14181B;
+  --panel-deep: #0A0C0D;
+  --line: rgba(255,255,255,.10);
+  --on-dark:        #FFFFFF;
+  --on-dark-soft:   rgba(255,255,255,.74);
+  --on-dark-muted:  rgba(255,255,255,.56);
+  --on-dark-faint:  rgba(255,255,255,.44);
+  /* light surfaces */
+  --bone:      #F4F2EF;
+  --bone-line: #D7D1C9;
+  --on-light:       #14181B;
+  --on-light-soft:  #4A5359;
+  --on-light-faint: #7C858B;
+  /* accent — CALL/TEXT ACTIONS ONLY */
+  --accent:      #FF6B1A;
+  --accent-ink:  #0E1113;
+  --accent-deep: #C2540C;
+  /* type */
+  --display: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --body:    'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --t-hero:    clamp(2.875rem, 11.8vw, 4rem);
+  --t-page-h1: clamp(2.375rem, 9.7vw, 3rem);
+  --t-h2:      clamp(1.8125rem, 7.4vw, 2.25rem);
+  --t-h3:      1.125rem;
+  --t-body:    1rem;
+  --t-small:   0.90625rem;
+  --t-eyebrow: 0.6875rem;
+  --gutter: 22px;
+  --tap: 52px;
+  --btn: 58px;
+  /* derived — roles the block above doesn't name */
+  --scrim-hero: linear-gradient(180deg, rgba(14,17,19,.55) 0%, rgba(14,17,19,.30) 34%, rgba(14,17,19,.88) 74%, #0E1113 100%);
+  --scrim-page: linear-gradient(180deg, rgba(14,17,19,.62) 0%, rgba(14,17,19,.42) 40%, rgba(14,17,19,.93) 82%, #0E1113 100%);
+  --tag-before: rgba(20,24,27,.82);
+  --on-accent-soft: rgba(14,17,19,.76);
+  --accent-hairline: rgba(14,17,19,.42);
+  --callbar-h: calc(var(--btn) + 20px);
+  /* extra alphas the mockups use that the block above doesn't name */
+  --on-dark-strong: rgba(255,255,255,.85);
+  --on-dark-quote:  rgba(255,255,255,.84);
+  --on-dark-nav:    rgba(255,255,255,.72);
+  --on-dark-label:  rgba(255,255,255,.62);
+  --on-dark-dim:    rgba(255,255,255,.50);
+  --on-dark-mini:   rgba(255,255,255,.46);
+  --line-strong:    rgba(255,255,255,.12);
+  --on-accent-mini: rgba(14,17,19,.66);
+  --on-light-label: rgba(20,24,27,.66);
+  --field:  #FFFFFF;
+  /* placeholder texture — stands in for a photo, never ships as one */
+  --ph-1: #46525A; --ph-2: #2C353A; --ph-3: #171D20;
+  --phl-1: #C9C2B8; --phl-2: #AFA79C; --phl-3: #8C8479;
+  --ph-warp:  rgba(255,255,255,.022); --ph-weft:  rgba(0,0,0,.03);
+  --phl-warp: rgba(0,0,0,.02);        --phl-weft: rgba(255,255,255,.02);
 }
 
-.field input { min-height: var(--tap); }
+/* ---------- reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+body, h1, h2, h3, p, figure, ul, dl, dd { margin: 0; }
+ul[class] { padding: 0; list-style: none; }
+img, svg, picture { display: block; max-width: 100%; }
+img { height: auto; }
+input, button, textarea, select { font: inherit; color: inherit; }
+button { background: none; border: none; }
+a, button { -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: 120px; }
 
-.field textarea { min-height: calc(var(--tap) * 2); resize: vertical; }
-
-.field [aria-invalid="true"] { border-color: var(--error); }
-
-.field__error {
-  font-size: var(--t-small);
-  font-weight: 600;
-  color: var(--error);
-}
-
-/* Send is an action, but not a call action, so it does not get --accent —
-   a second blue button would blunt the Call button sitting right above it. */
-.btn--send {
-  background: var(--ink);
-  color: var(--ink-invert);
-  border: 2px solid var(--ink);
-}
-
-.btn--send:hover,
-.btn--send:active { background: var(--ink-soft); border-color: var(--ink-soft); }
-
-.btn--send[disabled] { opacity: .65; cursor: default; }
-
-.form__done {
-  padding: var(--s5);
-  background: var(--paper-alt);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-}
-
-.form__done h3 { margin-bottom: var(--s2); }
-
-/* Grey placeholder standing in for a photo that doesn't exist yet.
-   Deliberately ugly: a placeholder that looks finished ships by accident. */
-.photo-needed {
-  display: grid;
-  place-items: center;
-  padding: var(--s5);
-  aspect-ratio: 16 / 9;
-  background: var(--paper-alt);
-  border: 2px dashed var(--ink-soft);
-  border-radius: var(--radius);
-  color: var(--ink-soft);
-  font-size: var(--t-small);
-  font-weight: 600;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
-
-/* Footer — the one inverted region on the page. */
-.footer {
-  padding-block: var(--s7);
-  background: var(--ink);
-  color: var(--ink-invert-soft);
-  font-size: var(--t-small);
-}
-
-.footer strong, .footer b { color: var(--ink-invert); }
-.footer a { color: var(--ink-invert); }
-.footer hr { border: 0; border-top: 1px solid var(--line-invert); margin-block: var(--s4); }
-
-/* --------------------------------------------------------------------------
-   8. Hero
-   -------------------------------------------------------------------------- */
-
-.hero__grid {
-  display: grid;
-  gap: var(--s6);
-}
-
-/* The trade line carries the same weight for search as the name does, so it
-   stays inside the <h1> at hero size. Lighter weight gives the two lines a
-   hierarchy without a second type size. */
-.hero__trade {
-  display: block;
-  margin-top: var(--s2);
-  font-weight: 600;
-}
-
-/* --------------------------------------------------------------------------
-   9. Sticky bars — mobile only
-   Both are removed at 768px+, where the whole page is visible anyway.
-   -------------------------------------------------------------------------- */
-
-/* Bottom call bar. CSS-only: it is painted on the first frame and cannot be
-   broken by a script failing to load. */
-.callbar {
-  position: fixed;
-  inset: auto 0 0 0;
-  z-index: 50;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--s2);
-  padding: var(--s2);
-  /* Clears the home indicator on notched phones. */
-  padding-bottom: calc(var(--s2) + env(safe-area-inset-bottom, 0px));
-  background: var(--paper);
-  border-top: 1px solid var(--line);
-  box-shadow: 0 -2px 8px rgb(20 24 29 / .12);
-}
-
-.callbar .btn { width: 100%; min-width: 0; }
-
-/* The bar is fixed, so it sits outside the flow and would otherwise cover
-   the last of the footer. This is the padding that stops it. */
 body {
+  font-family: var(--body);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  font-weight: 400;
+  color: var(--on-dark);
+  background: var(--ink);
   padding-bottom: calc(var(--callbar-h) + env(safe-area-inset-bottom, 0px));
 }
 
-/* Top bar. Revealed by JS once the hero is out of view; stays hidden with
-   JS off, which is correct — the hero's Call button and the bottom bar are
-   both still there. */
+/* ---------- type ---------- */
+h1, h2, h3 { font-family: var(--display); font-weight: 800; }
+.h-hero { font-size: var(--t-hero);    line-height: .98; letter-spacing: -.024em; text-wrap: balance; }
+.h-page { font-size: var(--t-page-h1); line-height: 1.02; letter-spacing: -.024em; }
+h2      { font-size: var(--t-h2);      line-height: 1.1;  letter-spacing: -.02em; }
+h3      { font-size: var(--t-h3);      line-height: 1.25; font-weight: 700; }
+
+a { color: inherit; text-decoration: none; }
+
+.lede  { color: var(--on-dark-soft); }
+.small { font-size: var(--t-small); }
+
+/* Eyebrow: 26x2 accent rule + spaced caps. */
+.eyebrow {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--body); font-weight: 600; font-size: var(--t-eyebrow);
+  letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
+}
+.eyebrow::before { content: ""; width: 26px; height: 2px; background: var(--accent); flex: none; }
+.on-light .eyebrow, .eyebrow--light { color: var(--accent-deep); }
+
+/* ---------- focus ---------- */
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.on-light :focus-visible, .cta :focus-visible { outline-color: var(--on-light); }
+
+.skip {
+  position: absolute; left: var(--gutter); top: 10px; z-index: 200;
+  padding: 12px 16px; background: var(--on-dark); color: var(--ink);
+  font-weight: 600; transform: translateY(-200%);
+}
+.skip:focus { transform: none; }
+
+/* ---------- reveal ---------- */
+.rise { animation: rise .85s cubic-bezier(.16,.84,.44,1) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+
+/* ---------- sections ---------- */
+.sec       { padding: 46px var(--gutter); background: var(--ink); }
+.on-light  { background: var(--bone); color: var(--on-light); }
+.on-light .lede, .on-light p { color: var(--on-light-soft); }
+.sec-head  { display: flex; flex-direction: column; gap: 11px; margin-bottom: 24px; }
+.stack     { display: flex; flex-direction: column; }
+.gap-10 > * + * { margin-top: 10px; }
+.gap-16 > * + * { margin-top: 16px; }
+.gap-22 > * + * { margin-top: 22px; }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: var(--btn); padding: 0 18px;
+  font-family: var(--display); font-size: 17px; font-weight: 700; line-height: 1;
+  letter-spacing: .01em; text-align: center;
+}
+.btn svg { flex: none; }
+.btn--call { background: var(--accent); color: var(--accent-ink); }
+.btn--text { border: 1.5px solid var(--on-dark-faint); color: var(--on-dark); font-weight: 700; }
+/* On the accent CTA band the colours invert: the band is already accent. */
+.btn--oncta-call { background: var(--ink); color: var(--on-dark); min-height: 56px; font-size: 16px; }
+.btn--oncta-text { border: 1.5px solid var(--accent-hairline); color: var(--accent-ink); min-height: 56px; font-size: 16px; }
+.btn--send { background: var(--on-light); color: var(--on-dark); min-height: var(--btn); font-size: 16px; width: 100%; }
+.btn[disabled] { opacity: .65; }
+
+/* ---------- top bar ---------- */
 .topbar {
-  position: fixed;
-  inset: 0 0 auto 0;
-  z-index: 60;
-  height: var(--topbar-h);
-  background: var(--paper);
-  border-bottom: 1px solid var(--line);
-  box-shadow: var(--shadow);
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 18px; background: var(--ink); border-bottom: 1px solid var(--line);
 }
-
-.topbar[hidden] { display: none; }
-
-.topbar__inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s3);
-  height: 100%;
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand__mark {
+  width: 30px; height: 30px; flex: none; border: 2px solid var(--accent);
+  display: flex; align-items: center; justify-content: center;
 }
+.brand__mark i { width: 10px; height: 10px; background: var(--accent); display: block; }
+.brand__name {
+  font-family: var(--display); font-weight: 800; font-size: 13px; line-height: 1;
+  letter-spacing: .09em; text-transform: uppercase; color: var(--on-dark);
+}
+.topbar__right { display: flex; align-items: center; gap: 12px; }
+.callpill {
+  display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 15px;
+  background: var(--accent); color: var(--accent-ink);
+  font-family: var(--display); font-weight: 700; font-size: 13px; line-height: 1;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.burger { display: flex; flex-direction: column; gap: 4px; padding: 8px 0; }
+.burger i { width: 22px; height: 2px; background: var(--on-dark); display: block; }
 
-/* Truncates rather than wraps: a long name must not push the Call button
-   off the bar. */
-.topbar__name {
-  min-width: 0;
+/* ---------- section nav ---------- */
+.secnav { display: flex; align-items: stretch; gap: 24px; padding: 0 18px; background: var(--panel); border-bottom: 1px solid var(--line); }
+.secnav a {
+  padding: 15px 0; font-weight: 600; font-size: 13px; line-height: 1;
+  color: var(--on-dark-dim); border-bottom: 2px solid transparent;
+}
+.secnav a[aria-current="page"] { color: var(--on-dark); border-bottom-color: var(--accent); }
+
+/* ---------- sticky bottom call bar (mobile only) ---------- */
+.callbar {
+  position: fixed; inset: auto 0 0 0; z-index: 90;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  padding: 10px var(--gutter);
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  background: var(--ink); border-top: 1px solid var(--line);
+}
+.callbar .btn { min-height: var(--btn); padding: 0 10px; }
+.callbar[hidden] { display: none; }
+
+/* ---------- photo placeholders ---------- */
+.ph {
+  position: relative; overflow: hidden;
+  background:
+    repeating-linear-gradient(112deg, var(--ph-warp) 0 22px, var(--ph-weft) 22px 44px),
+    radial-gradient(130% 90% at 68% 18%, var(--ph-1) 0%, var(--ph-2) 46%, var(--ph-3) 100%);
+}
+.ph--light {
+  background:
+    repeating-linear-gradient(112deg, var(--phl-warp) 0 22px, var(--phl-weft) 22px 44px),
+    radial-gradient(130% 90% at 68% 18%, var(--phl-1) 0%, var(--phl-2) 52%, var(--phl-3) 100%);
+}
+.ph__label {
+  position: absolute; left: 14px; bottom: 12px; right: 14px;
+  font-weight: 600; font-size: 10px; line-height: 1.3; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--on-dark-label);
+}
+.ph--light .ph__label { color: var(--on-light-label); }
+.ph__label--top { bottom: auto; top: 14px; }
+
+/* ---------- hero / page header ---------- */
+.hero, .pagehead { position: relative; display: flex; flex-direction: column; justify-content: flex-end; }
+.hero { min-height: 620px; }
+.pagehead { min-height: 300px; }
+.hero::after, .pagehead::after { content: ""; position: absolute; inset: 0; }
+.hero::after    { background: var(--scrim-hero); }
+.pagehead::after { background: var(--scrim-page); }
+.hero__inner, .pagehead__inner { position: relative; z-index: 1; padding: 0 var(--gutter) 34px; display: flex; flex-direction: column; gap: 18px; }
+.pagehead__inner { padding-bottom: 30px; gap: 14px; }
+.hero__lede { max-width: 320px; }
+
+/* ---------- credential strip ---------- */
+.cred { display: grid; gap: 1px; background: var(--line); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.cred li { display: flex; align-items: center; gap: 14px; padding: 17px var(--gutter); background: var(--panel); }
+.cred svg { flex: none; }
+.cred span { font-size: 13.5px; line-height: 1.4; color: var(--on-dark-strong); }
+
+/* ---------- reviews marquee ---------- */
+.reviews { background: var(--panel); border-bottom: 1px solid var(--line); padding: 30px 0 28px; }
+.reviews__head { display: flex; align-items: center; gap: 11px; padding: 0 var(--gutter) 18px; }
+.stars { display: flex; gap: 2px; flex: none; }
+.marquee {
+  /* #000 below is a mask stop (opacity), not a colour — nothing renders it. */
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-weight: 700;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
 }
-
-/* 44px, not the 52px used elsewhere — that is the WCAG floor, and it is what
-   fits inside a 56px bar with breathing room. */
-.btn--compact {
-  flex: none;
-  width: auto;
-  min-height: 44px;
-  padding-inline: var(--s4);
-  font-size: 1rem;
-  box-shadow: none;
+.marquee-track {
+  display: flex; gap: 14px; width: max-content; padding-left: var(--gutter);
+  animation: marquee 34s linear infinite;
 }
+/* 4 unique cards x (300px + 14px gap) = 1256px. Recompute if N changes. */
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-1256px); } }
+.review {
+  width: 300px; flex-shrink: 0; background: var(--ink); border: 1px solid var(--line);
+  padding: 20px; display: flex; flex-direction: column; gap: 13px;
+}
+.review p { font-size: 14.5px; line-height: 1.6; color: var(--on-dark-quote); }
+.review cite { font-style: normal; font-weight: 600; font-size: 12.5px; color: var(--on-dark-muted); }
+.linkout { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; font-weight: 600; font-size: 13.5px; color: var(--on-dark); text-decoration: underline; text-underline-offset: 4px; }
+.on-light .linkout { color: var(--on-light); }
 
-/* --------------------------------------------------------------------------
-   10. Desktop — the only breakpoint
-   At 768px+ the hero gets more air and the gallery goes 2-up. Everything
-   else stays single-column and centred.
-   -------------------------------------------------------------------------- */
+/* ---------- work tiles ---------- */
+.tiles { display: flex; flex-direction: column; gap: 14px; }
+.tile figcaption { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-top: 13px; }
+.tile b { font-family: var(--body); font-weight: 600; font-size: 15px; line-height: 1.3; }
+.tile i { font-style: normal; font-size: 12.5px; color: var(--on-dark-faint); }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.grid2 .tile b { font-size: 13.5px; }
+.grid2 .tile figcaption { flex-direction: column; align-items: flex-start; gap: 4px; }
 
+/* ---------- before / after ---------- */
+.pair { display: flex; flex-direction: column; gap: 8px; }
+.pair__imgs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.pair figcaption { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.pair b { font-family: var(--body); font-weight: 600; font-size: 14.5px; }
+.pair i { font-style: normal; font-size: 12.5px; color: var(--on-light-faint); }
+.tag {
+  position: absolute; top: 12px; left: 12px; z-index: 1;
+  padding: 6px 11px; font-family: var(--display); font-weight: 700; font-size: 10px; line-height: 1;
+  letter-spacing: .14em; text-transform: uppercase;
+}
+.tag--before { background: var(--tag-before); color: var(--on-dark); }
+.tag--after  { background: var(--accent);     color: var(--accent-ink); }
+
+/* ---------- services ---------- */
+.svc { display: flex; align-items: flex-start; gap: 18px; padding: 24px 0; border-bottom: 1px solid var(--line); }
+.svc:last-child { border-bottom: 0; }
+.svc__n { font-weight: 600; font-size: 12px; line-height: 1.5; color: var(--on-dark-faint); min-width: 22px; flex: none; }
+.svc p { font-size: 14.5px; color: var(--on-dark-muted); margin-top: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 9px; }
+.chips li { padding: 9px 15px; background: var(--field); border: 1px solid var(--bone-line); font-weight: 600; font-size: 13.5px; line-height: 1; color: var(--on-light); }
+
+/* ---------- contact ---------- */
+.crow { display: flex; align-items: center; gap: 16px; padding: 20px; min-height: var(--tap); }
+.crow--call { background: var(--accent); color: var(--accent-ink); }
+.crow--alt  { background: var(--panel); border: 1px solid var(--line-strong); color: var(--on-dark); }
+.crow svg { flex: none; }
+.crow small { display: block; font-family: var(--display); font-weight: 700; font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 3px; }
+.crow--call small { color: var(--on-accent-mini); }
+.crow--alt  small { color: var(--on-dark-mini); }
+.crow b { font-family: var(--display); font-weight: 700; font-size: 19px; line-height: 1.1; }
+.crow .email { font-family: var(--body); font-weight: 600; font-size: 15px; word-break: break-all; }
+
+/* ---------- form ---------- */
+.hp { display: none; }
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label { font-weight: 600; font-size: 12.5px; letter-spacing: .04em; color: var(--on-light-soft); }
+.field input, .field textarea {
+  width: 100%; padding: 0 15px; background: var(--field); color: var(--on-light);
+  border: 1px solid var(--bone-line); font-size: 15px; line-height: 1.5;
+}
+.field input { height: var(--tap); }
+.field textarea { min-height: 118px; padding: 14px 15px; resize: vertical; }
+.field [aria-invalid="true"] { border-color: var(--accent-deep); border-width: 2px; }
+.field__error { font-weight: 600; font-size: 13px; color: var(--accent-deep); }
+.form-note { font-size: 13px; line-height: 1.55; color: var(--on-light-faint); }
+.form-done { padding: 20px; background: var(--field); border: 1px solid var(--bone-line); }
+.form-done p { margin-top: 8px; }
+.form-done a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- hours ---------- */
+.hours { display: flex; align-items: flex-start; gap: 14px; }
+.hours svg { flex: none; margin-top: 2px; }
+.hours b { font-family: var(--display); font-weight: 700; font-size: 14px; line-height: 1.3; display: block; }
+.hours span { font-size: 13.5px; line-height: 1.55; color: var(--on-dark-muted); }
+
+/* ---------- CTA band ---------- */
+.cta { background: var(--accent); color: var(--accent-ink); padding: 40px var(--gutter); display: flex; flex-direction: column; gap: 18px; }
+.cta p { color: var(--on-accent-soft); font-size: 15px; }
+.cta__btns { display: flex; flex-direction: column; gap: 10px; padding-top: 2px; }
+
+/* ---------- footer ---------- */
+.footer { background: var(--panel-deep); padding: 34px var(--gutter) 40px; display: flex; flex-direction: column; gap: 22px; }
+.footer__nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.footer__nav a { font-weight: 600; font-size: 14px; line-height: 1; color: var(--on-dark-nav); min-height: 44px; display: flex; align-items: center; }
+.footer hr { border: 0; height: 1px; background: var(--line); }
+.footer__meta { display: flex; flex-direction: column; gap: 7px; }
+.footer__meta p { font-size: 12.5px; line-height: 1.6; color: var(--on-dark-faint); }
+
+/* ---------- 768px ---------- */
 @media (min-width: 768px) {
-  .section { padding-block: var(--s8); }
-
-  /* Buttons stop being full-bleed and sit side by side — but only where
-     they actually fit. The pair has to work both in the 672px contact
-     section and in the ~360px hero column, so the stack wraps on its own
-     container width rather than on the viewport width. Sized off the
-     viewport, the pair overflows the hero column and slides under the
-     photo. */
-  .btn { width: fit-content; min-width: 15rem; max-width: 100%; }
-
-  .btn-stack { display: flex; flex-wrap: wrap; }
-  .btn-stack .btn { flex: 0 1 auto; }
-
-  /* Hero gets more vertical air and goes 2-up, photo beside the text. */
-  #hero { padding-block: calc(var(--s8) * 1.5); }
-
-  .hero__grid {
-    /* minmax(0, …) rather than a bare fr: an fr track floors at min-content,
-       and the hero <h1> is wide enough at 3.25rem that it would starve the
-       photo column down to a sliver. */
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
-    gap: var(--s7);
-    align-items: center;
-  }
-
-  .hero__photo { aspect-ratio: 4 / 5; }
-
-  /* Gallery goes two-up. A single shot takes one of the two columns rather
-     than stretching across both, so every photo on the page reads at the
-     same scale. */
-  .pair, .single { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-
-  /* Both sticky bars go away — a desktop user can see the whole page, so
-     the bars would only take space and repeat what is already on screen. */
-  .callbar, .topbar { display: none; }
+  .callbar { display: none; }
   body { padding-bottom: 0; }
+  .sec, .cta, .footer { padding-left: max(var(--gutter), calc((100% - 720px) / 2)); padding-right: max(var(--gutter), calc((100% - 720px) / 2)); }
+  .topbar, .secnav, .reviews__head { padding-left: max(18px, calc((100% - 720px) / 2)); padding-right: max(18px, calc((100% - 720px) / 2)); }
+  .hero__inner, .pagehead__inner { padding-left: max(var(--gutter), calc((100% - 720px) / 2)); padding-right: max(var(--gutter), calc((100% - 720px) / 2)); }
+  .marquee-track { padding-left: max(var(--gutter), calc((100% - 720px) / 2)); }
+  .cred li { padding-left: max(var(--gutter), calc((100% - 720px) / 2)); padding-right: max(var(--gutter), calc((100% - 720px) / 2)); }
+  .cta__btns { flex-direction: row; }
+  .cta__btns .btn { flex: 1; }
+  .hero__inner .btn-pair { flex-direction: row; }
+  .hero__inner .btn-pair .btn { flex: 1; }
 }
-
-/* --------------------------------------------------------------------------
-   11. Reduced motion
-   There is almost no motion here by design; this makes the little there is
-   honour the preference.
-   -------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .01ms !important;
-    scroll-behavior: auto !important;
-  }
+  .rise { animation: none; }
+  .marquee-track { animation: none; }
+  * { transition: none !important; }
 }
