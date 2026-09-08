@@ -230,11 +230,57 @@
         </a>
       </div>
 
-      <!-- The estimate form is built at CP5 (spec §6 Stage 1: markup,
-           validation and success state, but deliberately not wired to send).
-           Nothing form-shaped goes here before then — a form that looks
-           finished and silently swallows submissions is the worst bug this
-           site could ship with. -->
+      <p id="estimate-intro">Or send a message and I'll call you back.</p>
+
+      <!-- TODO CP9: form not wired -->
+      <!-- This form does not submit anywhere. action="#" is a placeholder and
+           main.js intercepts the submit, validates, and renders the success
+           state without sending a thing. CP9 (spec §6 Stage 2) adds
+           data-netlify, netlify-honeypot and the hidden form-name input,
+           drops action="#" and removes the interception. Until then, do not
+           give this page to a customer: the phone and text buttons are the
+           only working ways to reach him. -->
+      <form id="estimate" name="estimate" method="POST" action="#" class="form stack-lg">
+
+        <!-- Spam trap. Hidden from sight and from the tab order, so only a bot
+             fills it in. No reCAPTCHA: an external request, a mobile
+             conversion killer, and the volume here comes nowhere near
+             justifying it. -->
+        <p class="hp" aria-hidden="true">
+          <label>Company <input name="company" tabindex="-1" autocomplete="off"></label>
+        </p>
+
+        <div class="field">
+          <label for="f-name">Your name</label>
+          <input id="f-name" name="name" type="text" autocomplete="name"
+                 required aria-describedby="e-name">
+          <p class="field__error" id="e-name" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="f-phone">Your phone</label>
+          <input id="f-phone" name="phone" type="tel" inputmode="tel"
+                 autocomplete="tel" required aria-describedby="e-phone">
+          <p class="field__error" id="e-phone" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="f-need">What do you need?</label>
+          <textarea id="f-need" name="need" rows="4" maxlength="500"
+                    required aria-describedby="e-need"></textarea>
+          <p class="field__error" id="e-need" hidden></p>
+        </div>
+
+        <button type="submit" class="btn btn--send">Send</button>
+      </form>
+
+      <!-- Replaces the form on success. Repeats the number, because someone
+           who just asked for a callback is the likeliest person on the page
+           to want to call instead of wait. -->
+      <div class="form__done" id="estimate-done" role="status" tabindex="-1" hidden>
+        <h3>Got it. I'll call you back.</h3>
+        <p>Can't wait? Call <a href="tel:{{PHONE_RAW}}">{{PHONE_DISPLAY}}</a>.</p>
+      </div>
 
     </div>
   </section>

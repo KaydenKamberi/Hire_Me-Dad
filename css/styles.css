@@ -58,6 +58,8 @@
   --ink-invert-soft: #c8ced6;  /* body text on the dark footer — 11.2:1 */
   --line-invert:     #333c46;  /* dividers on the dark footer */
 
+  --error:      #b42318;       /* form validation — 6.6:1 on --paper */
+
   --focus-ring: var(--ink);    /* deliberately NOT --accent, so a focus ring
                                   never reads as a call-to-action */
   --focus-width: 3px;
@@ -413,6 +415,60 @@ a:hover { text-decoration-thickness: 2px; }
   font-style: normal;
   color: var(--ink-soft);
 }
+
+/* --- Estimate form -------------------------------------------------------
+   Inputs border in --ink-soft (7.6:1), not --line (1.36:1): a field boundary
+   carries meaning, so WCAG 1.4.11 holds it to 3:1. */
+
+.hp { display: none; }
+
+.field { display: grid; gap: var(--s2); }
+
+.field label { font-weight: 600; }
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: var(--s3);
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink-soft);
+  border-radius: var(--radius);
+}
+
+.field input { min-height: var(--tap); }
+
+.field textarea { min-height: calc(var(--tap) * 2); resize: vertical; }
+
+.field [aria-invalid="true"] { border-color: var(--error); }
+
+.field__error {
+  font-size: var(--t-small);
+  font-weight: 600;
+  color: var(--error);
+}
+
+/* Send is an action, but not a call action, so it does not get --accent —
+   a second blue button would blunt the Call button sitting right above it. */
+.btn--send {
+  background: var(--ink);
+  color: var(--ink-invert);
+  border: 2px solid var(--ink);
+}
+
+.btn--send:hover,
+.btn--send:active { background: var(--ink-soft); border-color: var(--ink-soft); }
+
+.btn--send[disabled] { opacity: .65; cursor: default; }
+
+.form__done {
+  padding: var(--s5);
+  background: var(--paper-alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.form__done h3 { margin-bottom: var(--s2); }
 
 /* Grey placeholder standing in for a photo that doesn't exist yet.
    Deliberately ugly: a placeholder that looks finished ships by accident. */
